@@ -1,0 +1,308 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum Rol {
+  PATRON
+  AVUKAT
+  SEKRETER
+}
+
+enum MuvekkılTip {
+  KISI
+  SIRKET
+}
+
+enum DosyaTip {
+  DANISMANLIK
+  DAVA
+}
+
+enum DosyaDurum {
+  ACIK
+  DERDEST
+  KARAR
+  TEMYIZ
+  KAPALI
+}
+
+// ─── Models ──────────────────────────────────────────────────────────────────
+
+model User {
+  id          String   @id @default(cuid())
+  ad          String
+  email       String   @unique
+  sifreHash   String
+  rol         Rol      @default(AVUKAT)
+  telefon     String?
+  mtPrefiks   Boolean  @default(false)
+  aktif       Boolean  @default(true)
+  olusturulma DateTime @default(now())
+  guncelleme  DateTime @updatedAt
+
+  dosyalar              Dosya[]    @relation("AvukatDosyalari")
+  olusturulanDosyalar   Dosya[]    @relation("OlusturanDosyalar")
+  muvekkillar           Muvekkil[] @relation("AvukatMuvekkillar")
+  olusturulanMuvekkillar Muvekkil[] @relation("OlusturanMuvekkillar")
+  gorevler              Gorev[]    @relation("AtananGorevler")
+  bildirimler           Bildirim[]
+
+  @@map("users")
+}
+
+model Muvekkil {
+  id              String      @id @default(cuid())
+  muvekkılNo      Int?        @unique
+  tip             MuvekkılTip @default(KISI)
+  ad              String
+  tckn            String?
+  vkn             String?
+  telefon         String?
+  isTelefon       String?
+  email           String?
+  email2          String?
+  adres           String?
+  iban            String?
+  notlar          String?
+  kvkkOnay        Boolean     @default(false)
+  kvkkOnayTarihi  DateTime?
+  aktif           Boolean     @default(true)
+  olusturulma     DateTime    @default(now())
+  guncelleme      DateTime    @updatedAt
+
+  avukatId        String?
+  avukat          User?       @relation("AvukatMuvekkillar", fields: [avukatId], references: [id])
+
+  olusturanId     String?
+  olusturan       User?       @relation("OlusturanMuvekkillar", fields: [olusturanId], references: [id])
+
+  dosyalar Dosya[]
+
+  @@map("muvekkillar")
+}
+
+model Dosya {
+  id           String     @id @default(cuid())
+  dosyaNo      String?
+  esasNo       String?
+  tip          DosyaTip   @default(DAVA)
+  altTip       String?
+  mahkeme      String?
+  durum        DosyaDurum @default(ACIK)
+  acilisTarihi DateTime?
+  aciklama     String?
+
+  arsiv        Boolean    @default(false)
+
+  muvekkılId   String
+  muvekkil     Muvekkil   @relation(fields: [muvekkılId], references: [id], onDelete: Cascade)
+
+  avukatId     String?
+  avukat       User?      @relation("AvukatDosyalari", fields: [avukatId], references: [id])
+
+  olusturanId  String?
+  olusturan    User?      @relation("OlusturanDosyalar", fields: [olusturanId], references: [id])
+
+  karsiTaraflar KarsiTaraf[]
+  durusmalar    Durusma[]
+  gorevler      Gorev[]
+  odemeler      Odeme[]
+  belgeler      Belge[]
+
+  olusturulma  DateTime   @default(now())
+  guncelleme   DateTime   @updatedAt
+
+  @@map("cases")
+}
+
+enum DurusmaTur {
+  DURUSMA
+  KESIF
+  TOPLANTI
+  SON_GUN
+}
+
+enum DurusmaDurum {
+  BEKLIYOR
+  TAMAMLANDI
+  IPTAL
+}
+
+enum GorevTur {
+  GOREV
+  SURE
+  TEMYIZ
+  ITIRAZ
+}
+
+enum GorevDurum {
+  BEKLIYOR
+  TAMAMLANDI
+  GECTI
+}
+
+enum BildirimTur {
+  DURUSMA_HATIRLATMA
+  SURE_HATIRLATMA
+  TAHSILAT_HATIRLATMA
+  GENEL
+}
+
+enum OdemeTur {
+  VEKALET_UCRETI
+  AVANS
+  TAHSILAT
+  MASRAF
+}
+
+enum OdemeDurum {
+  BEKLIYOR
+  ODENDI
+  KISMI_ODENDI
+  IPTAL
+}
+
+model Durusma {
+  id          String       @id @default(cuid())
+  dosyaId     String
+  dosya       Dosya        @relation(fields: [dosyaId], references: [id], onDelete: Cascade)
+  tarih       DateTime
+  tur         DurusmaTur   @default(DURUSMA)
+  yer         String?
+  sonucNotu   String?
+  sonrakiAdim String?
+  durum       DurusmaDurum @default(BEKLIYOR)
+  olusturulma DateTime     @default(now())
+  guncelleme  DateTime     @updatedAt
+
+  @@map("durusmalar")
+}
+
+model Gorev {
+  id               String     @id @default(cuid())
+  dosyaId          String?
+  dosya            Dosya?     @relation(fields: [dosyaId], references: [id], onDelete: SetNull)
+  baslik           String
+  aciklama         String?
+  tur              GorevTur   @default(GOREV)
+  sonTarih         DateTime
+  atananId         String?
+  atanan           User?      @relation("AtananGorevler", fields: [atananId], references: [id])
+  durum            GorevDurum @default(BEKLIYOR)
+  hatirlatmaTarihi DateTime?
+  olusturulma      DateTime   @default(now())
+  guncelleme       DateTime   @updatedAt
+
+  @@map("gorevler")
+}
+
+model Bildirim {
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tur         BildirimTur
+  mesaj       String
+  okundu      Boolean     @default(false)
+  ilgiliId    String?
+  ilgiliTip   String?
+  olusturulma DateTime    @default(now())
+
+  @@map("bildirimler")
+}
+
+model Odeme {
+  id          String     @id @default(cuid())
+  dosyaId     String
+  dosya       Dosya      @relation(fields: [dosyaId], references: [id], onDelete: Cascade)
+  tur         OdemeTur
+  tutar       Decimal    @db.Decimal(12, 2)
+  aciklama    String?
+  tarih       DateTime
+  durum       OdemeDurum @default(BEKLIYOR)
+  olusturulma DateTime   @default(now())
+  guncelleme  DateTime   @updatedAt
+
+  @@map("odemeler")
+}
+
+model KarsiTaraf {
+  id       String  @id @default(cuid())
+  dosyaId  String
+  dosya    Dosya   @relation(fields: [dosyaId], references: [id], onDelete: Cascade)
+  ad       String
+  vekili   String?
+  iletisim String?
+
+  @@map("karsi_taraflar")
+}
+
+enum BelgeTur {
+  VEKALETNAME
+  DILEKCE
+  SOZLESME
+  KARAR
+  TUTANAK
+  MAKBUZ
+  DIGER
+}
+
+model Belge {
+  id          String    @id @default(cuid())
+  dosyaId     String
+  dosya       Dosya     @relation(fields: [dosyaId], references: [id], onDelete: Cascade)
+  ad          String
+  dosyaYolu   String
+  boyut       Int
+  mimeTipi    String
+  tur         BelgeTur  @default(DIGER)
+  aciklama    String?
+  yuklendi    DateTime  @default(now())
+
+  @@map("belgeler")
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  kullaniciId String?
+  kullaniciAd String?
+  eylem       String
+  kaynak      String
+  kaynakId    String?
+  detay       String?
+  tarih       DateTime @default(now())
+
+  @@map("audit_logs")
+  @@index([tarih])
+  @@index([kullaniciId])
+}
+
+enum EmsalKaynagi {
+  YARGITAY
+  DANISTAY
+  AYM
+  BOLGE_ADLIYE
+  DIGER
+}
+
+model EmsalKarar {
+  id          String       @id @default(cuid())
+  mahkeme     String
+  kararNo     String?
+  esasNo      String?
+  tarih       DateTime?
+  kaynak      EmsalKaynagi @default(YARGITAY)
+  konu        String
+  ozet        String
+  tamMetin    String?
+  etiketler   String?
+  olusturulma DateTime     @default(now())
+  guncelleme  DateTime     @updatedAt
+
+  @@map("emsal_kararlar")
+}
