@@ -9,6 +9,9 @@
     "lint": "next lint",
     "seed": "ts-node -r dotenv/config --skip-project prisma/seed.ts"
   },
+  "engines": {
+    "node": ">=22"
+  },
   "prisma": {
     "seed": "ts-node -r dotenv/config --skip-project prisma/seed.ts"
   },
