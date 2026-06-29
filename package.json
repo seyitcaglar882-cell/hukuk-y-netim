@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 4000",
-    "build": "next build",
-    "start": "next start",
+    "build": "prisma generate && prisma migrate deploy && next build",
+    "start": "next start -p ${PORT:-3000}",
     "lint": "next lint",
     "seed": "ts-node -r dotenv/config --skip-project prisma/seed.ts"
   },
