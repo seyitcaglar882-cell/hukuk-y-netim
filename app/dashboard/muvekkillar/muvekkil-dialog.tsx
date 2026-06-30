@@ -95,7 +95,7 @@ export function MuvekkılDialog({ open, onClose, muvekkil, mtAvukatlar = [] }: P
           iban: form.iban || undefined,
           notlar: form.notlar || undefined,
           kvkkOnay: form.kvkkOnay,
-          sahibiAvukatId: form.sahibiAvukatId || undefined,
+          sahibiAvukatId: form.sahibiAvukatId,
         };
         if (duzenle) {
           await muvekkılGuncelle(muvekkil!.id, data);
