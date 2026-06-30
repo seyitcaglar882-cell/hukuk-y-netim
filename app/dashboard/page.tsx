@@ -33,19 +33,17 @@ export default async function DashboardPage() {
   const rol = session?.user?.rol;
   const userId = session?.user?.id;
 
-  const dosyaWhere = rol === "AVUKAT" ? {
-    OR: [
-      { avukatId: userId },
-      { olusturanId: userId },
-    ],
-  } : {};
+  const dosyaWhere = rol === "AVUKAT"
+    ? { OR: [{ avukatId: userId }, { olusturanId: userId }] }
+    : rol === "PATRON"
+    ? { muvekkil: { avukatId: userId } }
+    : {};
 
-  const muvekkılWhere = rol === "AVUKAT" ? {
-    OR: [
-      { avukatId: userId },
-      { olusturanId: userId },
-    ],
-  } : {};
+  const muvekkılWhere = rol === "AVUKAT"
+    ? { OR: [{ avukatId: userId }, { olusturanId: userId }] }
+    : rol === "PATRON"
+    ? { avukatId: userId }
+    : {};
 
   const [acikDosya, toplamDosya, muvekkılSayisi, durusmalar, gorevler] = await Promise.all([
     prisma.dosya.count({ where: { ...dosyaWhere, durum: { not: "KAPALI" } } }),
