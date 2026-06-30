@@ -32,6 +32,8 @@ export async function muvekkilleriGetir(opts?: { aktif?: boolean }) {
   const where: Record<string, unknown> = { aktif: opts?.aktif ?? true };
   if (rol === "AVUKAT") {
     Object.assign(where, avukatGorunurlukFiltresi(userId));
+  } else if (rol === "PATRON") {
+    where.avukatId = userId; // sadece MT olarak atananlar
   }
 
   return prisma.muvekkil.findMany({
@@ -63,6 +65,8 @@ export async function muvekkiliGetir(id: string) {
   if (rol === "AVUKAT") {
     const izin = muvekkil.avukatId === userId || muvekkil.olusturanId === userId;
     if (!izin) return null;
+  } else if (rol === "PATRON") {
+    if (muvekkil.avukatId !== userId) return null;
   }
   return muvekkil;
 }
@@ -94,6 +98,8 @@ export async function muvekkiliProfilGetir(id: string) {
   if (rol === "AVUKAT") {
     const izin = muvekkil.avukatId === userId || muvekkil.olusturanId === userId;
     if (!izin) return null;
+  } else if (rol === "PATRON") {
+    if (muvekkil.avukatId !== userId) return null;
   }
   return muvekkil;
 }

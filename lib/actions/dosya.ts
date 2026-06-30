@@ -19,7 +19,7 @@ export async function dosyalariGetir(opts?: { arama?: string; durum?: DosyaDurum
 
   const andConds: Record<string, unknown>[] = [];
 
-  // Sahiplik filtresi: avukat kendi açtıklarını görür
+  // Sahiplik filtresi
   if (rol === "AVUKAT") {
     andConds.push({
       OR: [
@@ -27,6 +27,9 @@ export async function dosyalariGetir(opts?: { arama?: string; durum?: DosyaDurum
         { avukatId: userId },
       ],
     });
+  } else if (rol === "PATRON") {
+    // sadece MT olarak atanmış müvekkillerin dosyaları
+    andConds.push({ muvekkil: { avukatId: userId } });
   }
 
   // Arama filtresi
