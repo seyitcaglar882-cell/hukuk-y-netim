@@ -19,11 +19,14 @@ export async function dosyalariGetir(opts?: { arama?: string; durum?: DosyaDurum
 
   const andConds: Record<string, unknown>[] = [];
 
-  // Sahiplik filtresi: ben oluşturdum
+  // Sahiplik filtresi: avukat kendi açtıklarını görür
   if (rol === "AVUKAT") {
-    andConds.push({ olusturanId: userId });
-  } else if (opts?.avukatId && rol === "PATRON") {
-    andConds.push({ olusturanId: opts.avukatId });
+    andConds.push({
+      OR: [
+        { olusturanId: userId },
+        { avukatId: userId },
+      ],
+    });
   }
 
   // Arama filtresi
@@ -102,6 +105,7 @@ export async function dosyaEkle(data: {
       durum: data.durum,
       aciklama: data.aciklama,
       muvekkılId: data.muvekkılId,
+      avukatId: userId,
       olusturanId: userId,
       acilisTarihi: data.acilisTarihi ? new Date(data.acilisTarihi) : null,
     },
