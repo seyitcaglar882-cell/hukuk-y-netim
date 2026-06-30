@@ -145,11 +145,8 @@ export async function muvekkılEkle(data: {
   if (data.tckn && data.tckn.length !== 11) throw new Error("TCKN 11 haneli olmalıdır.");
   if (data.vkn && data.vkn.length !== 10) throw new Error("VKN 10 haneli olmalıdır.");
 
-  // avukatId = sahibi (Mustafa ya da kendin), olusturanId = her zaman sen
-  let avukatId: string | null = null;
-  if (rol !== "SEKRETER") {
-    avukatId = data.sahibiAvukatId ?? userId;
-  }
+  // avukatId = sadece MT checkbox işaretlendiyse set et, yoksa null
+  const avukatId = data.sahibiAvukatId || null;
   const olusturanId = userId;
 
   const son = await prisma.muvekkil.findFirst({
@@ -196,6 +193,7 @@ export async function muvekkılGuncelle(
     iban?: string;
     notlar?: string;
     kvkkOnay?: boolean;
+    sahibiAvukatId?: string;
   }
 ) {
   const session = await oturumKontrol();
@@ -216,9 +214,14 @@ export async function muvekkılGuncelle(
   const mevcut = await prisma.muvekkil.findUnique({ where: { id }, select: { kvkkOnay: true, kvkkOnayTarihi: true } });
   const kvkkTarih = data.kvkkOnay && !mevcut?.kvkkOnay ? new Date() : (data.kvkkOnay ? mevcut?.kvkkOnayTarihi : null);
 
+  const { sahibiAvukatId, ...geriKalan } = data;
   await prisma.muvekkil.update({
     where: { id },
-    data: { ...data, kvkkOnayTarihi: kvkkTarih ?? null },
+    data: {
+      ...geriKalan,
+      avukatId: sahibiAvukatId !== undefined ? (sahibiAvukatId || null) : undefined,
+      kvkkOnayTarihi: kvkkTarih ?? null,
+    },
   });
   await auditLog({
     kullaniciId: session.user.id,

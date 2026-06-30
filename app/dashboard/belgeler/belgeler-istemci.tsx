@@ -61,8 +61,7 @@ type Belge = {
     id: string;
     esasNo: string | null;
     dosyaNo: string | null;
-    muvekkil: { ad: string };
-    avukat: { ad: string; mtPrefiks: boolean } | null;
+    muvekkil: { ad: string; avukat: { mtPrefiks: boolean } | null };
   };
 };
 
@@ -433,7 +432,7 @@ export function BelgelerIstemci({
                             onClick={(e) => e.stopPropagation()}
                           >
                             <p className="text-sm font-medium group-hover:text-primary transition-colors">
-                              {b.dosya.avukat?.mtPrefiks && (
+                              {b.dosya.muvekkil.avukat?.mtPrefiks && (
                                 <span className="text-amber-600 font-bold">MT *{" "}</span>
                               )}
                               {b.dosya.muvekkil.ad}

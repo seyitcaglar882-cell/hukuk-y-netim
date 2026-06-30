@@ -44,8 +44,12 @@ const BELGE_DOSYA_INCLUDE = {
       id: true,
       esasNo: true,
       dosyaNo: true,
-      muvekkil: { select: { ad: true } },
-      avukat: { select: { ad: true, mtPrefiks: true } },
+      muvekkil: {
+        select: {
+          ad: true,
+          avukat: { select: { mtPrefiks: true } },
+        },
+      },
     },
   },
 } as const;
