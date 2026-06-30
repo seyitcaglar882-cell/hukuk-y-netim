@@ -146,7 +146,7 @@ export async function muvekkılEkle(data: {
   sahibiAvukatId?: string;
 }) {
   const session = await oturumKontrol();
-  const { id: userId, rol } = session.user;
+  const { id: userId } = session.user;
 
   if (data.tckn && data.tckn.length !== 11) throw new Error("TCKN 11 haneli olmalıdır.");
   if (data.vkn && data.vkn.length !== 10) throw new Error("VKN 10 haneli olmalıdır.");
