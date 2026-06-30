@@ -116,9 +116,9 @@ export async function muvekkiliNoileGetir(no: number) {
 }
 
 export async function mtPrefiksAvukatlariGetir() {
-  const session = await oturumKontrol();
+  await oturumKontrol();
   return prisma.user.findMany({
-    where: { mtPrefiks: true, aktif: true, NOT: { id: session.user.id } },
+    where: { mtPrefiks: true, aktif: true, rol: "PATRON" },
     select: { id: true, ad: true },
     orderBy: { ad: "asc" },
   });
