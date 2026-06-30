@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,6 +43,19 @@ export function KullaniciDialog({ open, onClose, kullanici }: Props) {
     telefon: kullanici?.telefon ?? "",
     mtPrefiks: kullanici?.mtPrefiks ?? false,
   });
+
+  useEffect(() => {
+    if (open) {
+      setForm({
+        ad: kullanici?.ad ?? "",
+        email: kullanici?.email ?? "",
+        sifre: "",
+        rol: kullanici?.rol ?? "AVUKAT",
+        telefon: kullanici?.telefon ?? "",
+        mtPrefiks: kullanici?.mtPrefiks ?? false,
+      });
+    }
+  }, [open, kullanici]);
 
   function handleClose() {
     if (!pending) onClose();

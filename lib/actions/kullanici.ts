@@ -55,7 +55,7 @@ export async function kullaniciEkle(data: {
     },
   });
 
-  revalidatePath("/patron/kullanicilar");
+  revalidatePath("/dashboard/patron/kullanicilar");
 }
 
 export async function kullaniciGuncelle(
@@ -80,7 +80,7 @@ export async function kullaniciGuncelle(
     },
   });
 
-  revalidatePath("/patron/kullanicilar");
+  revalidatePath("/dashboard/patron/kullanicilar");
 }
 
 export async function kullaniciDurumDegistir(id: string, aktif: boolean) {
