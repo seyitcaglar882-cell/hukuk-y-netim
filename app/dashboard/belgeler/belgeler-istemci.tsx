@@ -434,9 +434,7 @@ export function BelgelerIstemci({
                           >
                             <p className="text-sm font-medium group-hover:text-primary transition-colors">
                               {b.dosya.avukat?.mtPrefiks && (
-                                <span className="text-amber-600 font-bold">
-                                  {b.dosya.avukat.ad.split(" ").map((s: string) => s[0] ?? "").join("").toUpperCase()} *{" "}
-                                </span>
+                                <span className="text-amber-600 font-bold">MT *{" "}</span>
                               )}
                               {b.dosya.muvekkil.ad}
                             </p>

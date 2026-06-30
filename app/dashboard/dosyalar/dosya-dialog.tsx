@@ -26,7 +26,7 @@ const DURUM_ETIKET: Record<DosyaDurum, string> = {
   KAPALI: "Kapalı",
 };
 
-type Muvekkil = { id: string; ad: string; tip: MuvekkılTip; avukatId?: string | null };
+type Muvekkil = { id: string; ad: string; tip: MuvekkılTip };
 
 type Dosya = {
   id: string;
@@ -39,7 +39,6 @@ type Dosya = {
   acilisTarihi: Date | null;
   aciklama: string | null;
   muvekkılId: string;
-  avukatId: string | null;
 };
 
 type Props = {
@@ -69,7 +68,6 @@ export function DosyaDialog({ open, onClose, dosya, muvekkillar }: Props) {
     durum: dosya?.durum ?? ("DERDEST" as DosyaDurum),
     aciklama: dosya?.aciklama ?? "",
     muvekkılId: dosya?.muvekkılId ?? (muvekkillar[0]?.id ?? ""),
-    avukatId: dosya?.avukatId ?? "",
   });
 
   function handleSubmit(e: React.FormEvent) {
@@ -87,7 +85,6 @@ export function DosyaDialog({ open, onClose, dosya, muvekkillar }: Props) {
           acilisTarihi: acilisTarihi ? format(acilisTarihi, "yyyy-MM-dd") : undefined,
           aciklama: form.aciklama || undefined,
           muvekkılId: form.muvekkılId,
-          avukatId: form.avukatId || undefined,
         };
         if (duzenle) {
           await dosyaGuncelle(dosya!.id, data);
@@ -139,14 +136,7 @@ export function DosyaDialog({ open, onClose, dosya, muvekkillar }: Props) {
             <label className="text-sm font-medium">Müvekkil *</label>
             <Select
               value={form.muvekkılId}
-              onValueChange={(v) => {
-                const secilenMuvekkil = muvekkillar.find((m) => m.id === v);
-                setForm({
-                  ...form,
-                  muvekkılId: v ?? "",
-                  avukatId: secilenMuvekkil?.avukatId ?? form.avukatId,
-                });
-              }}
+              onValueChange={(v) => setForm({ ...form, muvekkılId: v ?? "" })}
               disabled={pending}
             >
               <SelectTrigger>

@@ -41,10 +41,6 @@ function initials(ad: string): string {
   return ad.split(" ").slice(0, 2).map((s) => s[0] ?? "").join("").toUpperCase();
 }
 
-function avukatInitials(ad: string): string {
-  return ad.split(" ").map((s) => s[0] ?? "").join("").toUpperCase();
-}
-
 export function MuvekkillerIstemci({
   aktifler,
   pasifler,
@@ -265,7 +261,7 @@ export function MuvekkillerIstemci({
                               <p className="font-semibold text-sm group-hover:text-primary transition-colors">
                                 {m.avukat?.mtPrefiks ? (
                                   <>
-                                    <span className="text-amber-600 font-bold">{avukatInitials(m.avukat.ad)} * </span>
+                                    <span className="text-amber-600 font-bold">MT * </span>
                                     {m.ad}
                                   </>
                                 ) : m.ad}

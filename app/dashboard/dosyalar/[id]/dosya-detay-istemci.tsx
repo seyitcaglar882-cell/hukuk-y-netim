@@ -48,9 +48,8 @@ type Dosya = {
   id: string; dosyaNo: string | null; esasNo: string | null;
   tip: DosyaTip; altTip: string | null; mahkeme: string | null;
   durum: DosyaDurum; acilisTarihi: Date | null; aciklama: string | null;
-  muvekkılId: string; avukatId: string | null;
-  muvekkil: { id: string; ad: string; tip: MuvekkılTip; tckn: string | null; vkn: string | null; telefon: string | null; email: string | null; iban: string | null };
-  avukat: { id: string; ad: string; email: string; mtPrefiks: boolean } | null;
+  muvekkılId: string;
+  muvekkil: { id: string; ad: string; tip: MuvekkılTip; tckn: string | null; vkn: string | null; telefon: string | null; email: string | null; iban: string | null; avukat: { mtPrefiks: boolean } | null };
   karsiTaraflar: { id: string; ad: string; vekili: string | null; iletisim: string | null }[];
 };
 
@@ -141,10 +140,8 @@ export function DosyaDetayIstemci({
                 </span>
               </div>
               <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.55)" }}>
-                {dosya.avukat?.mtPrefiks && (
-                  <span className="font-bold" style={{ color: "#fbbf24" }}>
-                    {dosya.avukat.ad.split(" ").map((s: string) => s[0] ?? "").join("").toUpperCase()} *{" "}
-                  </span>
+                {dosya.muvekkil.avukat?.mtPrefiks && (
+                  <span className="font-bold" style={{ color: "#fbbf24" }}>MT *{" "}</span>
                 )}
                 {dosya.muvekkil.ad}{dosya.mahkeme ? ` · ${dosya.mahkeme}` : ""}
               </p>
@@ -209,7 +206,6 @@ export function DosyaDetayIstemci({
                 label="Açılış Tarihi"
                 value={dosya.acilisTarihi ? new Date(dosya.acilisTarihi).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }) : null}
               />
-              <InfoRow icon={<User className="h-3.5 w-3.5" />} label="Atanan Avukat" value={dosya.avukat?.ad} />
             </dl>
             {dosya.aciklama && (
               <div className="px-5 py-4 border-t bg-muted/20">
@@ -237,10 +233,8 @@ export function DosyaDetayIstemci({
                 </div>
                 <div>
                   <p className="font-semibold">
-                    {dosya.avukat?.mtPrefiks && (
-                      <span className="text-amber-600 font-bold">
-                        {dosya.avukat.ad.split(" ").map((s: string) => s[0] ?? "").join("").toUpperCase()} *{" "}
-                      </span>
+                    {dosya.muvekkil.avukat?.mtPrefiks && (
+                      <span className="text-amber-600 font-bold">MT *{" "}</span>
                     )}
                     {dosya.muvekkil.ad}
                   </p>
@@ -510,13 +504,13 @@ export function DosyaDetayIstemci({
       <DurusmaDialog
         open={durusmaEkleAcik}
         onClose={() => { setDurusmaEkleAcik(false); router.refresh(); }}
-        dosyalar={[{ id: dosya.id, esasNo: dosya.esasNo, dosyaNo: dosya.dosyaNo, muvekkil: { ad: dosya.muvekkil.ad, tip: dosya.muvekkil.tip }, avukatId: dosya.avukatId, avukat: dosya.avukat ? { ad: dosya.avukat.ad, mtPrefiks: dosya.avukat.mtPrefiks } : null }]}
+        dosyalar={[{ id: dosya.id, esasNo: dosya.esasNo, dosyaNo: dosya.dosyaNo, muvekkil: { ad: dosya.muvekkil.ad, tip: dosya.muvekkil.tip }, avukatId: null, avukat: dosya.muvekkil.avukat ? { ad: dosya.muvekkil.ad, mtPrefiks: dosya.muvekkil.avukat.mtPrefiks } : null }]}
         avukatlar={avukatlar}
       />
       <GorevDialog
         open={gorevEkleAcik}
         onClose={() => { setGorevEkleAcik(false); router.refresh(); }}
-        dosyalar={[{ id: dosya.id, esasNo: dosya.esasNo, dosyaNo: dosya.dosyaNo, muvekkil: { ad: dosya.muvekkil.ad, tip: dosya.muvekkil.tip }, avukatId: dosya.avukatId, avukat: dosya.avukat ? { ad: dosya.avukat.ad, mtPrefiks: dosya.avukat.mtPrefiks } : null }]}
+        dosyalar={[{ id: dosya.id, esasNo: dosya.esasNo, dosyaNo: dosya.dosyaNo, muvekkil: { ad: dosya.muvekkil.ad, tip: dosya.muvekkil.tip }, avukatId: null, avukat: dosya.muvekkil.avukat ? { ad: dosya.muvekkil.ad, mtPrefiks: dosya.muvekkil.avukat.mtPrefiks } : null }]}
         avukatlar={avukatlar}
         dosyaId={dosya.id}
       />

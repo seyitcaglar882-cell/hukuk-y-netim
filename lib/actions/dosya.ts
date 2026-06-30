@@ -19,16 +19,11 @@ export async function dosyalariGetir(opts?: { arama?: string; durum?: DosyaDurum
 
   const andConds: Record<string, unknown>[] = [];
 
-  // Sahiplik filtresi: kendi oluşturduğun VEYA sahibi olduğun
+  // Sahiplik filtresi: ben oluşturdum
   if (rol === "AVUKAT") {
-    andConds.push({
-      OR: [
-        { avukatId: userId },    // sahibi ben
-        { olusturanId: userId }, // ben oluşturdum
-      ],
-    });
+    andConds.push({ olusturanId: userId });
   } else if (opts?.avukatId && rol === "PATRON") {
-    andConds.push({ avukatId: opts.avukatId });
+    andConds.push({ olusturanId: opts.avukatId });
   }
 
   // Arama filtresi
@@ -57,8 +52,14 @@ export async function dosyalariGetir(opts?: { arama?: string; durum?: DosyaDurum
     where,
     orderBy: { olusturulma: "desc" },
     include: {
-      muvekkil: { select: { id: true, ad: true, tip: true } },
-      avukat: { select: { id: true, ad: true, mtPrefiks: true } },
+      muvekkil: {
+        select: {
+          id: true,
+          ad: true,
+          tip: true,
+          avukat: { select: { mtPrefiks: true } },
+        },
+      },
       _count: { select: { karsiTaraflar: true } },
     },
   });
@@ -69,8 +70,9 @@ export async function dosyayiGetir(id: string) {
   return prisma.dosya.findUnique({
     where: { id },
     include: {
-      muvekkil: true,
-      avukat: { select: { id: true, ad: true, email: true, mtPrefiks: true } },
+      muvekkil: {
+        include: { avukat: { select: { mtPrefiks: true } } },
+      },
       karsiTaraflar: true,
     },
   });
@@ -86,33 +88,21 @@ export async function dosyaEkle(data: {
   acilisTarihi?: string;
   aciklama?: string;
   muvekkılId: string;
-  avukatId?: string;
 }) {
   const session = await oturumKontrol();
-  const { id: userId, rol } = session.user;
-
-  // avukatId = müvekkilin sahibinden türet, yoksa kendi ID'i
-  let avukatId = data.avukatId || undefined;
-  if (!avukatId) {
-    const muvkl = await prisma.muvekkil.findUnique({
-      where: { id: data.muvekkılId },
-      select: { avukatId: true },
-    });
-    if (muvkl?.avukatId) {
-      avukatId = muvkl.avukatId;
-    } else if (rol === "AVUKAT") {
-      avukatId = userId;
-    }
-  }
-
-  // olusturanId = her zaman dosyayı sisteme giren kişi
-  const olusturanId = userId;
+  const { id: userId } = session.user;
 
   const dosya = await prisma.dosya.create({
     data: {
-      ...data,
-      avukatId,
-      olusturanId,
+      dosyaNo: data.dosyaNo,
+      esasNo: data.esasNo,
+      tip: data.tip,
+      altTip: data.altTip,
+      mahkeme: data.mahkeme,
+      durum: data.durum,
+      aciklama: data.aciklama,
+      muvekkılId: data.muvekkılId,
+      olusturanId: userId,
       acilisTarihi: data.acilisTarihi ? new Date(data.acilisTarihi) : null,
     },
   });
@@ -142,7 +132,6 @@ export async function dosyaGuncelle(
     acilisTarihi?: string;
     aciklama?: string;
     muvekkılId?: string;
-    avukatId?: string | null;
   }
 ) {
   await oturumKontrol();

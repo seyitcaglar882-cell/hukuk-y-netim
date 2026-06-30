@@ -33,12 +33,11 @@ type Dosya = {
   id: string; dosyaNo: string | null; esasNo: string | null;
   tip: DosyaTip; altTip: string | null; mahkeme: string | null;
   durum: DosyaDurum; acilisTarihi: Date | null; aciklama: string | null;
-  muvekkılId: string; avukatId: string | null;
-  muvekkil: { id: string; ad: string; tip: MuvekkılTip };
-  avukat: { id: string; ad: string; mtPrefiks: boolean } | null;
+  muvekkılId: string;
+  muvekkil: { id: string; ad: string; tip: MuvekkılTip; avukat: { mtPrefiks: boolean } | null };
 };
 
-type Muvekkil = { id: string; ad: string; tip: MuvekkılTip; avukatId?: string | null };
+type Muvekkil = { id: string; ad: string; tip: MuvekkılTip };
 
 export function DosyalarIstemci({
   aktifDosyalar,
@@ -201,7 +200,6 @@ export function DosyalarIstemci({
                   <TableHead className="text-[11px] font-bold uppercase tracking-wider text-foreground/50">Dosya</TableHead>
                   <TableHead className="text-[11px] font-bold uppercase tracking-wider text-foreground/50">Müvekkil</TableHead>
                   <TableHead className="text-[11px] font-bold uppercase tracking-wider text-foreground/50">Mahkeme</TableHead>
-                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-foreground/50">Avukat</TableHead>
                   <TableHead className="text-[11px] font-bold uppercase tracking-wider text-foreground/50">Durum</TableHead>
                   <TableHead className="text-[11px] font-bold uppercase tracking-wider text-foreground/50">Açılış</TableHead>
                   <TableHead className="w-16" />
@@ -210,7 +208,7 @@ export function DosyalarIstemci({
               <TableBody>
                 {filtrelenmis.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground py-16">
+                    <TableCell colSpan={6} className="text-center text-muted-foreground py-16">
                       <FolderOpen className="h-10 w-10 mx-auto mb-3 opacity-20" />
                       <p className="font-medium text-sm">
                         {arama || durumFiltre !== "TUMU"
@@ -234,19 +232,14 @@ export function DosyalarIstemci({
                       </TableCell>
                       <TableCell>
                         <Link href={`/dashboard/dosyalar/${d.id}`} className="text-sm font-medium">
-                          {d.avukat?.mtPrefiks && (
-                            <span className="text-amber-600 font-bold">
-                              {d.avukat.ad.split(" ").map((s: string) => s[0] ?? "").join("").toUpperCase()} *{" "}
-                            </span>
+                          {d.muvekkil.avukat?.mtPrefiks && (
+                            <span className="text-amber-600 font-bold">MT * </span>
                           )}
                           {d.muvekkil.ad}
                         </Link>
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         <Link href={`/dashboard/dosyalar/${d.id}`}>{d.mahkeme || "—"}</Link>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        <Link href={`/dashboard/dosyalar/${d.id}`}>{d.avukat?.ad || "—"}</Link>
                       </TableCell>
                       <TableCell>
                         <Link href={`/dashboard/dosyalar/${d.id}`}>

@@ -13,7 +13,7 @@ import { GorevTur, MuvekkılTip } from "@prisma/client";
 type Dosya = { id: string; esasNo: string | null; dosyaNo: string | null; muvekkil: { ad: string; tip: MuvekkılTip }; avukatId: string | null; avukat?: { ad: string; mtPrefiks: boolean } | null };
 
 function dosyaEtiketi(d: Dosya): string {
-  const prefix = d.avukat?.mtPrefiks ? `${d.avukat.ad.split(" ").map(s => s[0] ?? "").join("").toUpperCase()} * ` : "";
+  const prefix = d.avukat?.mtPrefiks ? "MT * " : "";
   return `${prefix}${d.esasNo || d.dosyaNo || d.id.slice(0, 8)} — ${d.muvekkil.ad}`;
 }
 type Avukat = { id: string; ad: string };

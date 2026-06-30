@@ -153,7 +153,7 @@ export function MuvekkılDialog({ open, onClose, muvekkil, mtAvukatlar = [] }: P
                   />
                   <div>
                     <p className="text-sm font-medium">{mt.ad} adına ekle</p>
-                    <p className="text-xs text-muted-foreground">Müvekkil listesinde isminin başında <span className="font-semibold text-amber-600">{mt.ad.split(" ").map((s: string) => s[0] ?? "").join("").toUpperCase()} *</span> kodu ile görünecektir.</p>
+                    <p className="text-xs text-muted-foreground">Müvekkil listesinde isminin başında <span className="font-semibold text-amber-600">MT *</span> kodu ile görünecektir.</p>
                   </div>
                 </label>
               ))}

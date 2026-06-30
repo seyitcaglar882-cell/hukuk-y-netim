@@ -311,7 +311,7 @@ export function MuvekkılProfil({ muvekkil }: { muvekkil: Muvekkil }) {
                 </span>
                 {muvekkil.avukat?.mtPrefiks && (
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider" style={{ backgroundColor: "rgba(251,191,36,0.25)", color: "#fbbf24" }}>
-                    {muvekkil.avukat.ad.split(" ").map((s) => s[0] ?? "").join("").toUpperCase()}
+                    MT
                   </span>
                 )}
               </div>
