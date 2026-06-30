@@ -220,12 +220,22 @@ export async function muvekkılGuncelle(
   const mevcut = await prisma.muvekkil.findUnique({ where: { id }, select: { kvkkOnay: true, kvkkOnayTarihi: true } });
   const kvkkTarih = data.kvkkOnay && !mevcut?.kvkkOnay ? new Date() : (data.kvkkOnay ? mevcut?.kvkkOnayTarihi : null);
 
-  const { sahibiAvukatId, ...geriKalan } = data;
   await prisma.muvekkil.update({
     where: { id },
     data: {
-      ...geriKalan,
-      avukatId: sahibiAvukatId !== undefined ? (sahibiAvukatId || null) : undefined,
+      tip: data.tip,
+      ad: data.ad,
+      tckn: data.tckn ?? null,
+      vkn: data.vkn ?? null,
+      telefon: data.telefon ?? null,
+      isTelefon: data.isTelefon ?? null,
+      email: data.email ?? null,
+      email2: data.email2 ?? null,
+      adres: data.adres ?? null,
+      iban: data.iban ?? null,
+      notlar: data.notlar ?? null,
+      kvkkOnay: data.kvkkOnay ?? false,
+      avukatId: data.sahibiAvukatId !== undefined ? (data.sahibiAvukatId || null) : undefined,
       kvkkOnayTarihi: kvkkTarih ?? null,
     },
   });
